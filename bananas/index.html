@@ -5,107 +5,162 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raspberry Pi Camera Viewer</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    
-
-    
-    <div class="centered-text">
-        バナナ成熟度チェッカー🍌
-    </div>
-    
     <style>
-        
-
-        .centered-text {
-        font-family: 'Roboto', sans-serif; /* Robotoフォントを適用 */
-        font-size: 2rem; 
-        font-weight: bold; /* 太字 */
-        margin-bottom: 400px;
-        
-        white-space: nowrap; 
-        justify-content:center; /* 横方向中央揃え */
-        align-items: flex-start; /* 縦方向を上寄せ */
-        position: absolute;
-       
-         }
-    
-    
-        
-        /* 全体のスタイル */
+        /* フォント */
         body {
+            
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             min-height: 100vh;
             background: linear-gradient(135deg, #f3e6ff, #e9f7ff);
         }
 
-        /* カードデザイン */
-        .container {
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            max-width: 400px;
+        
+
+        
+        /* 中央に配置 */
+        .centered-text {
+            font-size: 2rem;
+            font-weight: bold;
+            position: absolute;
+            top: 20%;
             text-align: center;
+            width: 100%;
         }
 
-        h1 {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 20px;
+        /* レシピセクション */
+
+        .container{
+            text-align: center;
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f5e6;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
         }
+
+
+        .recipe {
+            text-align: center;
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f5e6;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+
+        }
+
+
+
 
         button {
-            background: linear-gradient(135deg, #6c63ff, #4a47a3);
-            color: #fff;
-            border: none;
-            border-radius: 25px;
             padding: 10px 20px;
-            font-size: 16px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #d4a017;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background: linear-gradient(135deg, #4a47a3, #6c63ff);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #b8860b;
         }
 
-        img {
+        /* カメラ画像セクション */
+        #camera-image {
             max-width: 100%;
             height: auto;
             border-radius: 10px;
             margin-top: 20px;
         }
 
-        #ripeness {
+        #ripeness, #message {
             font-size: 18px;
             color: #4a47a3;
             margin-top: 10px;
         }
 
         #message {
-            font-size: 18px;
             color: #ff4d4d;
+        }
+
+        /* リンクセクション */
+        #recipe-link {
+            display: none;
             margin-top: 10px;
+        }
+
+        #recipe-url {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        #recipe-url:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
+    <div class="centered-text">
+        バナナ成熟度チェッカー🍌
+    </div>
+
+
+
     <div class="container">
         <h1>Raspberry Pi Camera Viewer</h1>
         <button id="refresh">最新画像を表示</button>
+        
         <div id="image-container">
             <img id="camera-image" src="" alt="Raspberry Pi Camera Image" style="display: none;">
             <p id="ripeness" style="display: none;"></p>
             <p id="message" style="display: none;">これはバナナではありません</p>
+            <p id="recipe-link" style="display: none;">
+                <a href="#" target="_blank" id="recipe-url"></a>
+            </p>
         </div>
+
+
+    
     </div>
+
+ <div class="recipe">
+        <h1>おすすめバナナレシピ</h1>
+        <button id="randomize-btn">レシピを見る</button>
+        <div id="recipe-link">
+            <a href="#" target="_blank" id="recipe-url"></a>
+ </div>
+
     <script>
+        // レシピ一覧
+        const recipes = [
+            { name: "チョコバナナドッグ", url: "https://www.sumifru.co.jp/recipe/sommelier279/" },
+            { name: "焼きバナナドーナツ", url: "https://www.sumifru.co.jp/recipe/sommelier278/" },
+            { name: "バナナホットサンド", url: "https://www.sumifru.co.jp/recipe/sommelier265/" }
+        ];
+
+        const randomizeButton = document.getElementById('randomize-btn');
+        const recipeLink = document.getElementById('recipe-link');
+        const recipeUrl = document.getElementById('recipe-url');
+
+        randomizeButton.addEventListener('click', () => {
+            const randomIndex = Math.floor(Math.random() * recipes.length);
+            const selectedRecipe = recipes[randomIndex];
+
+            recipeUrl.href = selectedRecipe.url;
+            recipeUrl.textContent = selectedRecipe.name;
+            recipeLink.style.display = 'block';
+        });
+
         const refreshButton = document.getElementById('refresh');
         const cameraImage = document.getElementById('camera-image');
         const ripenessText = document.getElementById('ripeness');
@@ -138,5 +193,6 @@
     </script>
 </body>
 </html>
+
 
 
